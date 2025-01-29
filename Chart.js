@@ -1,7 +1,3 @@
-// Initialiser les tableaux pour les statistiques
-let speedData = [];
-let timeData = [];
-
 // Fonction pour obtenir la localisation
 function getLocation() {
   if (navigator.geolocation) {
@@ -35,10 +31,10 @@ function showPosition(position) {
 function showError(error) {
   switch (error.code) {
     case error.PERMISSION_DENIED:
-      alert("Permission de géolocalisation refusée.");
+      alert("Permission de géolocalisation refusée. Veuillez autoriser l'accès.");
       break;
     case error.POSITION_UNAVAILABLE:
-      alert("La position est indisponible.");
+      alert("La position est indisponible. Essayez à nouveau.");
       break;
     case error.TIMEOUT:
       alert("La demande de géolocalisation a expiré.");
@@ -76,7 +72,7 @@ function updateChart() {
       datasets: [{
         label: 'Vitesse (km/h)',
         data: speedData, // Vitesse
-        borderColor: 'rgba(75, 192, 192, 1)',
+        borderColor: '#1D9BF0', // Couleur bleue iOS
         fill: false,
         tension: 0.1
       }]
@@ -103,5 +99,5 @@ function updateChart() {
 // Obtenir la localisation dès que la page est chargée
 window.onload = function() {
   getLocation();
-  setInterval(getLocation, 5000); // Mettre à jour toutes les 5 secondes
+  setInterval(getLocation, 1000); // Mettre à jour toutes les 5 secondes
 };
