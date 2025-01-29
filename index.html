@@ -4,17 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Géolocalisation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e2f; /* Fond sombre */
+            color: #ffffff; /* Texte blanc */
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #00bcd4; /* Titre coloré */
+        }
+        button {
+            background-color: #00bcd4;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #008c9e;
+        }
+        p {
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
     <h1>Test Géolocalisation</h1>
-    <button id="getLocationBtn">Obtenir ma position</button>
-    <p id="status"></p>
+    <button id="getLocationBtn">Demander ma position</button>
+    <p id="status">Cliquez sur le bouton pour obtenir votre position.</p>
     <p>Latitude: <span id="latitude">-</span></p>
     <p>Longitude: <span id="longitude">-</span></p>
 
     <script>
         document.getElementById("getLocationBtn").addEventListener("click", function() {
             if (navigator.geolocation) {
+                // Demande de la position
                 navigator.geolocation.getCurrentPosition(showPosition, showError);
             } else {
                 document.getElementById("status").innerText = "La géolocalisation n'est pas supportée sur ce navigateur.";
@@ -22,12 +54,14 @@
         });
 
         function showPosition(position) {
+            // Affichage des données de position
             document.getElementById("latitude").innerText = position.coords.latitude;
             document.getElementById("longitude").innerText = position.coords.longitude;
             document.getElementById("status").innerText = "Position récupérée avec succès !";
         }
 
         function showError(error) {
+            // Gestion des erreurs de géolocalisation
             switch (error.code) {
                 case error.PERMISSION_DENIED:
                     document.getElementById("status").innerText = "Permission de géolocalisation refusée.";
