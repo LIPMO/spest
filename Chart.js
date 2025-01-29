@@ -1,7 +1,12 @@
 // Fonction pour obtenir la localisation
 function getLocation() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition, showError);
+    // Demande la localisation
+    navigator.geolocation.getCurrentPosition(showPosition, showError, {
+      enableHighAccuracy: true,  // Demander une localisation plus précise
+      timeout: 10000,            // Temps maximum pour obtenir la position (10 secondes)
+      maximumAge: 0              // Toujours demander une nouvelle position
+    });
   } else {
     alert("La géolocalisation n'est pas supportée par ce navigateur.");
   }
@@ -98,6 +103,9 @@ function updateChart() {
 
 // Obtenir la localisation dès que la page est chargée
 window.onload = function() {
+  // Demande de localisation
   getLocation();
-  setInterval(getLocation, 1000); // Mettre à jour toutes les 5 secondes
+
+  // Mettre à jour toutes les 5 secondes
+  setInterval(getLocation, 5000);
 };
