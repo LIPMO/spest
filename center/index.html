@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracker Moto/Trottinette</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            background-color: #1c1f2d; /* Fond sombre bleu iOS */
+            color: #ffffff; /* Texte blanc */
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #00b0f4; /* Bleu iOS */
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #00b0f4; /* Bleu iOS */
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            background-color: #0087c0; /* Teinte plus foncée de bleu */
+        }
+        p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        canvas {
+            max-width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            border-radius: 12px;
+        }
+        .status {
+            font-size: 20px;
+            color: #00e5ff; /* Bleu clair pour la vitesse */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tracker Moto/Trottinette</h1>
+    <p id="status" class="status">Vitesse : 0 km/h</p>
+    <p>Latitude : <span id="latitude">0.0</span></p>
+    <p>Longitude : <span id="longitude">0.0</span></p>
+    <button id="resetBtn">Réinitialiser</button>
+
+    <!-- Graphique de la vitesse -->
+    <canvas id="speedChart"></canvas>
+
+    <script>
+        let speedData = [];
+        let timeData = [];
+        let speedChart;
+
+        // Initialisation du graphique
+        function initializeChart() {
+            const ctx = document.getElementById('speedChart').getContext('2d');
+            speedChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timeData,
+                    datasets: [{
+                        label: 'Vitesse (km/h)',
+                        data: speedData,
+                        borderColor: '#00b0f4', // Bleu iOS pour la ligne
+                        backgroundColor: 'rgba(0, 176, 244, 0.3)', // Fond légèrement bleu
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            suggestedMax: 100,
+                            grid: {
+                                color: '#444'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: '#444'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Mettre à jour la position et la vitesse
+        function updateLocation(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const speed = position.coords.speed ? position.coords.speed * 3.6 : 0; // Vitesse en km/h
+
+            document.getElementById('latitude').textContent = lat;
+            document.getElementById('longitude').textContent = lon;
+            document.getElementById('status').textContent = `Vitesse : ${speed.toFixed(2)} km/h`;
+
+            // Ajouter la vitesse au graphique
+            const time = new Date().toLocaleTimeString();
+            speedData.push(speed);
+            timeData.push(time);
+
+            // Limiter à 30 points pour ne pas surcharger le graphique
+            if (speedData.length > 30) {
+                speedData.shift();
+                timeData.shift();
+            }
+
+            speedChart.update();
+        }
+
+        // Gérer les erreurs de géolocalisation
+        function showError(error) {
+            document.getElementById('status').textContent = "Erreur de géolocalisation";
+        }
+
+        // Fonction pour démarrer la géolocalisation
+        function startTracking() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(updateLocation, showError, {
+                    enableHighAccuracy: true,
+                    maximumAge: 1000,
+                    timeout: 20000
+                });
+            } else {
+                document.getElementById('status').textContent = "Géolocalisation non supportée";
+            }
+        }
+
+        // Fonction pour réinitialiser les statistiques
+        function resetTracking() {
+            speedData = [];
+            timeData = [];
+            speedChart.data.labels = [];
+            speedChart.data.datasets[0].data = [];
+            speedChart.update();
+            document.getElementById('status').textContent = "Vitesse : 0 km/h";
+        }
+
+        // Event Listener pour le bouton de réinitialisation
+        document.getElementById('resetBtn').addEventListener('click', resetTracking);
+
+        // Initialisation du tracker
+        initializeChart();
+        startTracking();
+    </script>
+</body>
+</html>
