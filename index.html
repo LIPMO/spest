@@ -1,23 +1,48 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tracker Moto/Trottinette</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Inclure Chart.js -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Géolocalisation</title>
 </head>
 <body>
-  <div id="container">
-    <h1>Tracker Moto/Trottinette</h1>
-    <p>Vitesse : <span id="speed">0</span> km/h</p>
-    <p>Latitude : <span id="latitude">0.0</span></p>
-    <p>Longitude : <span id="longitude">0.0</span></p>
-    <button id="resetBtn" class="btn-reset">Réinitialiser</button>
-    <h2>Graphique de la vitesse</h2>
-    <canvas id="speedChart" width="400" height="200"></canvas> <!-- Le graphique -->
-  </div>
+    <h1>Test Géolocalisation</h1>
+    <button id="getLocationBtn">Obtenir ma position</button>
+    <p id="status"></p>
+    <p>Latitude: <span id="latitude">-</span></p>
+    <p>Longitude: <span id="longitude">-</span></p>
 
-  <script src="script.js"></script>
+    <script>
+        document.getElementById("getLocationBtn").addEventListener("click", function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                document.getElementById("status").innerText = "La géolocalisation n'est pas supportée sur ce navigateur.";
+            }
+        });
+
+        function showPosition(position) {
+            document.getElementById("latitude").innerText = position.coords.latitude;
+            document.getElementById("longitude").innerText = position.coords.longitude;
+            document.getElementById("status").innerText = "Position récupérée avec succès !";
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById("status").innerText = "Permission de géolocalisation refusée.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById("status").innerText = "Position indisponible.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById("status").innerText = "Demande de géolocalisation expirée.";
+                    break;
+                default:
+                    document.getElementById("status").innerText = "Erreur inconnue.";
+                    break;
+            }
+        }
+    </script>
 </body>
 </html>
