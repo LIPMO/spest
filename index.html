@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracker Moto/Trottinette</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Inclure Chart.js -->
+</head>
+<body>
+  <div id="container">
+    <h1>Tracker Moto/Trottinette</h1>
+    <p>Vitesse : <span id="speed">0</span> km/h</p>
+    <p>Latitude : <span id="latitude">0.0</span></p>
+    <p>Longitude : <span id="longitude">0.0</span></p>
+    <button id="resetBtn">Réinitialiser</button>
+    <h2>Graphique de la vitesse</h2>
+    <canvas id="speedChart" width="400" height="200"></canvas> <!-- Le graphique -->
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
