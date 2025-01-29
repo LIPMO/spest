@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracker Moto/Trottinette</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e2f; /* Fond sombre */
+            color: #ffffff; /* Texte blanc */
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #00bcd4; /* Titre coloré */
+        }
+        button {
+            background-color: #00bcd4;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #008c9e;
+        }
+        p {
+            font-size: 18px;
+        }
+        canvas {
+            max-width: 100%;
+            height: 300px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tracker Moto/Trottinette</h1>
+    <p id="status">Vitesse : 0 km/h</p>
+    <p>Latitude : <span id="latitude">0.0</span></p>
+    <p>Longitude : <span id="longitude">0.0</span></p>
+    <button id="resetBtn">Réinitialiser</button>
+
+    <!-- Graphique de la vitesse -->
+    <canvas id="speedChart"></canvas>
+
+    <script>
+        let speedData = [];
+        let timeData = [];
+        let speedChart;
+
+        // Initialisation du graphique
+        function initializeChart() {
+            const ctx = document.getElementById('speedChart').getContext('2d');
+            speedChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timeData,
+                    datasets: [{
+                        label: 'Vitesse (km/h)',
+                        data: speedData,
+                        borderColor: '#00bcd4',
+                        backgroundColor: 'rgba(0, 188, 212, 0.3)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            suggestedMax: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Mettre à jour la position et la vitesse
+        function updateLocation(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const speed = position.coords.speed ? position.coords.speed * 3.6 : 0; // Vitesse en km/h
+
+            document.getElementById('latitude').textContent = lat;
+            document.getElementById('longitude').textContent = lon;
+            document.getElementById('status').textContent = `Vitesse : ${speed.toFixed(2)} km/h`;
+
+            // Ajouter la vitesse au graphique
+            const time = new Date().toLocaleTimeString();
+            speedData.push(speed);
+            timeData.push(time);
+
+            // Limiter à 30 points pour ne pas surcharger le graphique
+            if (speedData.length > 30) {
+                speedData.shift();
+                timeData.shift();
+            }
+
+            speedChart.update();
+        }
+
+        // Gérer les erreurs de géolocalisation
+        function showError(error) {
+            document.getElementById('status').textContent = "Erreur de géolocalisation";
+        }
+
+        // Fonction pour démarrer la géolocalisation
+        function startTracking() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(updateLocation, showError, {
+                    enableHighAccuracy: true,
+                    maximumAge: 1000,
+                    timeout: 20000
+                });
+            } else {
+                document.getElementById('status').textContent = "Géolocalisation non supportée";
+            }
+        }
+
+        // Fonction pour réinitialiser les statistiques
+        function resetTracking() {
+            speedData = [];
+            timeData = [];
+            speedChart.data.labels = [];
+            speedChart.data.datasets[0].data = [];
+            speedChart.update();
+            document.getElementById('status').textContent = "Vitesse : 0 km/h";
+        }
+
+        // Event Listener pour le bouton de réinitialisation
+        document.getElementById('resetBtn').addEventListener('click', resetTracking);
+
+        // Initialisation du tracker
+        initializeChart();
+        startTracking();
+    </script>
+</body>
+</html>
